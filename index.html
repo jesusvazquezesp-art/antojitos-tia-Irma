@@ -78,6 +78,39 @@ footer{
     color:white;
     margin-top:30px;
 }
+    details[open] summary {
+    font-size: 0;
+}
+
+details[open] summary::after {
+    content: "Menos detalles";
+    font-size: 14px;
+}
+    .productos{
+    align-items:start;
+}
+
+.card{
+    align-self:start;
+}
+
+details{
+    margin:10px 15px 15px;
+}
+
+details h3{
+    font-size:14px;
+    margin:6px 0;
+}
+    .detalle-btn{
+    cursor:pointer;
+    color:white;
+    background:#0d6efd;
+    padding:8px 12px;
+    border-radius:8px;
+    display:inline-block;
+    font-size:14px;
+}
 </style>
 </head>
 
@@ -167,25 +200,25 @@ footer{
                  <div class="card">
             <img src="Paletas de Sandia.jpg" alt="Paletas de Sandia">
             
-            <h3>Paletas de Sandia</h3>
-            
-                                  <h3 style="color:darkblue;">● Sandia</h3>
+           <h2>Paleta de sandia</h2>
 
-<h3>&nbsp;</h3>
+<p class="precio">$25</p>
 
-<h3 style="color:black;">Puede contener:</h3>
+<details>
+    <summary class="detalle-btn">
+    Detalles del producto
+</summary>
 
-<h3>&nbsp;</h3>
-
-<h3 style="color:darkblue;">● Chamoy rojo</h3>
-<h3 style="color:darkblue;">● Chamoy azul</h3>
-<h3 style="color:darkblue;">● Tiko rojo</h3>
-<h3 style="color:darkblue;">● Tiko azul</h3>
-
-<h3>&nbsp;</h3>
-            <p class="precio">$15</p>
-            
-        </div>
+    <div style="margin-top:10px;">
+        <h3 style="color:darkblue;">● Sandia</h3>
+        <h3 style="color:black;">Puede contener:</h3>
+        <h3 style="color:darkblue;">● Chamoy rojo</h3>
+        <h3 style="color:darkblue;">● Chamoy azul</h3>
+        <h3 style="color:darkblue;">● Tiko rojo</h3>
+        <h3 style="color:darkblue;">● Tiko azul</h3>
+    </div>
+</details>
+                      </div>
         
         <div class="card">
             <img src="Paletas de Piña.jpg" alt="Paletas de Piña">
