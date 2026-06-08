@@ -60,9 +60,12 @@ header p{
     text-align:center;
 }
 .card img{
+    .card img{
     width:100%;
     height:100%;
     object-fit:cover;
+    transition:opacity .4s ease;
+}
 }
 .card h3{
     margin:15px 10px 5px;
@@ -130,7 +133,27 @@ details h3{
 </style>
     
 </head>
+<script>
+    
+document.querySelectorAll(".carrusel").forEach((img) => {
+    const imagenes = img.dataset.imagenes.split(",").map(x => x.trim());
+    let i = 0;
 
+    if (imagenes.length <= 1) return;
+
+    setInterval(() => {
+        img.style.opacity = 0;
+
+        setTimeout(() => {
+            i = (i + 1) % imagenes.length;
+            img.src = imagenes[i];
+            img.style.opacity = 1;
+        }, 400);
+
+    }, 2500);
+});
+</script>
+    
 <body>
 
 <header>
@@ -141,10 +164,10 @@ details h3{
     
      <h2 style="color:black;">Ubicados en Calle: Caballo 8752 Colonia Felipe Angeles:</h2>
     
-     <h3 style="color:black;">Horario:</h3>
+    <h3 style="color:black;">Horario:</h3>
     <h3 style="color:black;">Jueves y Viernes de 5 a 10 pm:</h3>
-     <h3 style="color:black;">Sabados en las segudas del camino real de 6 a 10 pm aun sin lugar fijo:</h3>
-     <h3 style="color:black;">Domingo de 2 a 10 pm:</h3>
+    <h3 style="color:black;">Sabados en las segudas del camino real de 6 a 10 pm aun sin lugar fijo:</h3>
+    <h3 style="color:black;">Domingo de 2 a 10 pm:</h3>
     <h3 style="color:black;">Pedidos rápidos por WhatsApp:</h3>
    
     
@@ -262,7 +285,7 @@ details h3{
 
 
         <div class="card">
-            <img src="Arizona Preparada.jpg" alt="Arizona Preparada">
+            <img class="carrusel" data-imagenes="arizonap1.jpg,arizonap2.jpg" src="arizonap1.jpg" alt="arizonap2">
             <h3>Arizona Preparada</h3>
             <p class="precio">$50</p>
               
