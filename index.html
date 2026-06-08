@@ -60,13 +60,14 @@ header p{
     text-align:center;
 }
 .card img{
-    .card img{
     width:100%;
-    height:100%;
-    object-fit:cover;
+    height:300px;
+    object-fit:contain;
+    background:#fff;
     transition:opacity .4s ease;
 }
-}
+
+
 .card h3{
     margin:15px 10px 5px;
     color:#bf360c;
@@ -133,26 +134,7 @@ details h3{
 </style>
     
 </head>
-<script>
-    
-document.querySelectorAll(".carrusel").forEach((img) => {
-    const imagenes = img.dataset.imagenes.split(",").map(x => x.trim());
-    let i = 0;
 
-    if (imagenes.length <= 1) return;
-
-    setInterval(() => {
-        img.style.opacity = 0;
-
-        setTimeout(() => {
-            i = (i + 1) % imagenes.length;
-            img.src = imagenes[i];
-            img.style.opacity = 1;
-        }, 400);
-
-    }, 2500);
-});
-</script>
     
 <body>
 
@@ -445,6 +427,25 @@ document.querySelectorAll(".carrusel").forEach((img) => {
 <footer>
     © 2026 Puesto Doña Cecy · Gracias por tu compra
 </footer>
+<script>
+    
+document.querySelectorAll(".carrusel").forEach((img) => {
+    const imagenes = img.dataset.imagenes.split(",").map(x => x.trim());
+    let i = 0;
 
+    if (imagenes.length <= 1) return;
+
+    setInterval(() => {
+        img.style.opacity = 0;
+
+        setTimeout(() => {
+            i = (i + 1) % imagenes.length;
+            img.src = imagenes[i];
+            img.style.opacity = 1;
+        }, 400);
+
+    }, 2500);
+});
+</script>
 </body>
 </html>
