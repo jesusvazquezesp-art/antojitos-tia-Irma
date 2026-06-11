@@ -506,23 +506,86 @@ body{padding-bottom:76px;}
     }
 }
 
+
+/* ===== Ajustes Cecy/Diana V1.3 ===== */
+.estado-puesto{
+    background:#E9D980 !important;
+    color:#3e2723 !important;
+    border:2px solid #d3bf45;
+    border-radius:16px;
+    padding:12px;
+    margin:0 auto 12px !important;
+    max-width:720px;
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+    font-weight:bold;
+}
+.estado-puesto .abierto,
+.estado-puesto .cerrado{
+    color:#3e2723 !important;
+    font-size:20px;
+}
+.panel-carrito{
+    z-index:10050 !important;
+    padding-bottom:105px !important;
+}
+.barra-carrito-mobile.oculta{
+    display:none !important;
+}
+.aviso-pago{
+    background:#E9D980 !important;
+    color:#3e2723 !important;
+    border:1px solid #d3bf45;
+}
+.resumen-anticipo{
+    background:#e8f5e9;
+    color:#1b5e20;
+    border-radius:12px;
+    padding:10px;
+    margin:8px 0 12px;
+    font-weight:bold;
+}
+@media(max-width:520px){
+    .estado-puesto{
+        margin:0 6px 10px !important;
+        font-size:15px;
+    }
+}
+
+
+/* ===== Conexión Supabase Pedidos Web V2 ===== */
+.estado-envio-web{
+    background:#e3f2fd;
+    color:#0d47a1;
+    border-radius:12px;
+    padding:10px;
+    margin:8px 0;
+    font-size:14px;
+    display:none;
+}
+.estado-envio-web.ok{background:#e8f5e9;color:#1b5e20;}
+.estado-envio-web.warn{background:#fff8e1;color:#e65100;}
+.estado-envio-web.error{background:#ffebee;color:#b71c1c;}
+
 </style>
     
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
     
 <body>
 
 <header>
-    <img src="portada.jpg"
-     alt="portada"
-     style="width:100%; max-height:500px; object-fit:cover; border-radius:20px;">
-    <h1>🍹 Puesto Doña Cecy</h1>
 
 <div class="estado-puesto">
     <div id="estadoAbierto">⏰ Revisando horario...</div>
     <small>Pedidos con pago anticipado · Recoge cuando esté listo</small>
 </div>
+
+    <img src="portada.jpg"
+     alt="portada"
+     style="width:100%; max-height:500px; object-fit:cover; border-radius:20px;">
+    <h1>🍹 Puesto Doña Cecy</h1>
+
 
     
      <div style="display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;">
@@ -905,21 +968,25 @@ body{padding-bottom:76px;}
         <input id="clienteHora" placeholder="Ejemplo: 7:30 pm">
 
         <label>Método de pago</label>
-        <select id="metodoPago">
+        <select id="metodoPago" onchange="actualizarAvisoPago()">
             <option value="Transferencia">Transferencia</option>
-            <option value="Mercado Pago próximamente">Mercado Pago próximamente</option>
+            <option value="Efectivo">Efectivo</option>
         </select>
 
         <label>Notas del pedido</label>
         <textarea id="clienteNotas" rows="3" placeholder="Ejemplo: sin chile, chamoy rojo, etc."></textarea>
 
-        <div class="aviso-pago">
-            <b>Pago anticipado:</b><br>
-            Para preparar tu pedido se solicitará comprobante de pago por WhatsApp.<br><br>
+        <div id="avisoPagoPedido" class="aviso-pago">
+            <b>Pago por transferencia:</b><br>
+            Para iniciar la preparación se requiere anticipo mínimo del <b>50%</b> del total.
+            También puedes liquidar completo si así gustas.<br><br>
+            Una vez realizado el depósito, se inicia la preparación y <b>se te notificará vía WhatsApp cuando tu pedido esté listo</b>.<br><br>
             <b>Cuenta / tarjeta:</b> PENDIENTE DE AGREGAR<br>
             <b>Titular:</b> Doña Cecy
         </div>
+        <div id="resumenAnticipo" class="resumen-anticipo">Anticipo mínimo: $0 · Saldo al recoger: $0</div>
 
+        <div id="estadoEnvioWeb" class="estado-envio-web"></div>
         <button class="btn-finalizar" onclick="finalizarPedidoWhatsApp()">📱 Enviar pedido y comprobante por WhatsApp</button>
     </div>
 </div>
@@ -1024,24 +1091,100 @@ function renderCarrito(){
     `).join("");
 }
 function toggleCarrito(){
-    const p = document.getElementById("panelCarrito");
-    const barra = document.getElementById("barraCarritoMobile");
-
+    const p=document.getElementById("panelCarrito");
+    const barra=document.getElementById("barraCarritoMobile");
     if(!p) return;
-
     const abierto = p.style.display === "block";
-
     if(abierto){
         p.style.display = "none";
-        if(barra) barra.style.display = "flex";
+        if(barra) barra.classList.remove("oculta");
     }else{
         p.style.display = "block";
-        if(barra) barra.style.display = "none";
+        if(barra) barra.classList.add("oculta");
     }
-
     renderCarrito();
 }
-function finalizarPedidoWhatsApp(){
+
+function actualizarAvisoPago(){
+    const metodo=document.getElementById("metodoPago")?.value || "Transferencia";
+    const aviso=document.getElementById("avisoPagoPedido");
+    const total=totalCarrito();
+    const anticipo=Math.ceil(total/2);
+    const saldo=Math.max(0,total-anticipo);
+    const resumen=document.getElementById("resumenAnticipo");
+
+    if(metodo==="Efectivo"){
+        if(aviso){
+            aviso.innerHTML=`<b>Pago en efectivo:</b><br>
+            Tu pedido queda registrado por WhatsApp, pero <b>se comenzará a preparar cuando llegues al puesto</b> y realices el pago.<br><br>
+            Esto ayuda a evitar preparar pedidos que no se recojan.`;
+        }
+        if(resumen) resumen.innerHTML=`Pago en efectivo al llegar: $${total.toFixed(0)} · Preparación al momento de llegar`;
+    }else{
+        if(aviso){
+            aviso.innerHTML=`<b>Pago por transferencia:</b><br>
+            Para iniciar la preparación se requiere anticipo mínimo del <b>50%</b> del total.
+            También puedes liquidar completo si así gustas.<br><br>
+            Una vez realizado el depósito, se inicia la preparación y <b>se te notificará vía WhatsApp cuando tu pedido esté listo</b>.<br><br>
+            <b>Cuenta / tarjeta:</b> PENDIENTE DE AGREGAR<br>
+            <b>Titular:</b> Doña Cecy`;
+        }
+        if(resumen) resumen.innerHTML=`Anticipo mínimo: $${anticipo.toFixed(0)} · Saldo al recoger: $${saldo.toFixed(0)}`;
+    }
+}
+
+function limpiarCarritoDespuesDePedido(){
+    carrito=[];
+    guardarCarrito();
+    renderCarrito();
+    const n=document.getElementById("clienteNombre");
+    const t=document.getElementById("clienteTelefono");
+    const h=document.getElementById("clienteHora");
+    const notas=document.getElementById("clienteNotas");
+    if(n) n.value="";
+    if(t) t.value="";
+    if(h) h.value="Lo antes posible";
+    if(notas) notas.value="";
+    const panel=document.getElementById("panelCarrito");
+    const barra=document.getElementById("barraCarritoMobile");
+    if(panel) panel.style.display="none";
+    if(barra) barra.classList.remove("oculta");
+    mostrarToastPedido("✅ Pedido generado. Carrito limpio.");
+}
+
+
+/* ===== Supabase pedidos web V2 ===== */
+const SUPABASE_URL_WEB = "https://vdmlmeiqqxjvczpeyrfo.supabase.co";
+const SUPABASE_KEY_WEB = "sb_publishable_okXFGFXrEZhu_bO8u-fLgw_6JRDutZ6";
+let dbWeb = null;
+
+function iniciarSupabaseWeb(){
+    try{
+        if(!window.supabase) return false;
+        if(!dbWeb) dbWeb = supabase.createClient(SUPABASE_URL_WEB, SUPABASE_KEY_WEB);
+        return true;
+    }catch(e){
+        console.warn("No se pudo iniciar Supabase web", e);
+        return false;
+    }
+}
+
+function estadoEnvioWeb(txt,tipo="warn"){
+    const el=document.getElementById("estadoEnvioWeb");
+    if(!el) return;
+    el.style.display="block";
+    el.className="estado-envio-web "+tipo;
+    el.innerHTML=txt;
+}
+
+async function guardarPedidoWebSupabase(payload){
+    if(!iniciarSupabaseWeb()) throw new Error("No se pudo conectar a Supabase.");
+    const {data,error} = await dbWeb.from("pedidos_web").insert(payload).select().single();
+    if(error) throw error;
+    return data;
+}
+
+async function finalizarPedidoWhatsApp(){
     if(!carrito.length){
         alert("Agrega productos al pedido.");
         return;
@@ -1051,6 +1194,9 @@ function finalizarPedidoWhatsApp(){
     const hora=document.getElementById("clienteHora").value.trim();
     const metodo=document.getElementById("metodoPago").value;
     const notas=document.getElementById("clienteNotas").value.trim();
+    const total=totalCarrito();
+    const anticipo=Math.ceil(total/2);
+    const saldo=Math.max(0,total-anticipo);
 
     if(!nombre || !tel){
         alert("Escribe tu nombre y teléfono.");
@@ -1068,46 +1214,50 @@ function finalizarPedidoWhatsApp(){
 `Teléfono: ${tel}%0A`+
 `Hora para recoger: ${hora || "Por confirmar"}%0A%0A`+
 `${detalle}%0A%0A`+
-`Total: $${totalCarrito().toFixed(0)}%0A`+
+`Total: $${total.toFixed(0)}%0A`+
 `Método de pago: ${metodo}%0A`+
+(metodo==="Efectivo"
+    ? `Pago: $${total.toFixed(0)} en efectivo al llegar%0AImportante: entiendo que mi pedido se comenzará a preparar cuando llegue al puesto y realice el pago.%0A`
+    : `Anticipo mínimo 50%: $${anticipo.toFixed(0)}%0ASaldo al recoger: $${saldo.toFixed(0)}%0AUna vez realizado el depósito, se inicia la preparación y se me notificará vía WhatsApp cuando mi pedido esté listo.%0A`
+)+
 `Notas: ${notas || "Sin notas"}%0A%0A`+
-`Voy a enviar el comprobante de pago para que puedan preparar mi pedido.`;
+(metodo==="Efectivo"
+    ? `Confirmo mi pedido y pasaré a pagar en efectivo.`
+    : `Voy a enviar el comprobante de pago para que puedan preparar mi pedido.`);
+
+
+    const detalleJson = carrito.map(x=>({
+        nombre:x.nombre,
+        precio:Number(x.precio),
+        cantidad:Number(x.cantidad),
+        subtotal:Number(x.precio)*Number(x.cantidad)
+    }));
+
+    const pedidoPayload = {
+        folio,
+        nombre,
+        telefono:tel,
+        hora_recoger:hora || "Por confirmar",
+        metodo_pago:metodo,
+        total:Number(total),
+        anticipo: metodo==="Efectivo" ? 0 : Number(anticipo),
+        saldo: metodo==="Efectivo" ? Number(total) : Number(saldo),
+        notas: notas || "",
+        detalle: detalleJson,
+        estado:"pendiente"
+    };
+
+    try{
+        estadoEnvioWeb("⏳ Guardando pedido en sistema...", "warn");
+        await guardarPedidoWebSupabase(pedidoPayload);
+        estadoEnvioWeb("✅ Pedido guardado. Ahora se abrirá WhatsApp.", "ok");
+    }catch(e){
+        estadoEnvioWeb("⚠️ No se pudo guardar en sistema, pero puedes enviarlo por WhatsApp.<br><small>"+(e.message||e)+"</small>", "error");
+    }
 
     const url = `https://wa.me/${WHATSAPP_CECY}?text=${mensaje}`;
     window.open(url, "_blank");
-// Limpiar carrito después de generar pedido
-carrito = [];
-guardarCarrito();
-renderCarrito();
-
-document.getElementById("clienteNombre").value = "";
-document.getElementById("clienteTelefono").value = "";
-document.getElementById("clienteHora").value = "Lo antes posible";
-document.getElementById("clienteNotas").value = "";
-
-const panel = document.getElementById("panelCarrito");
-if(panel) panel.style.display = "none";
-
-mostrarToastPedido("✅ Pedido enviado. Carrito limpio.");
-    
-    
-    
-   
-
-    setTimeout(()=>{
-        if(confirm("¿Ya enviaste el pedido por WhatsApp?\n\nSi presionas Aceptar, se limpiará el carrito para iniciar otro pedido.")){
-            carrito=[];
-            guardarCarrito();
-            renderCarrito();
-            document.getElementById("clienteNombre").value="";
-            document.getElementById("clienteTelefono").value="";
-            document.getElementById("clienteHora").value="Lo antes posible";
-            document.getElementById("clienteNotas").value="";
-            const panel=document.getElementById("panelCarrito");
-            if(panel) panel.style.display="none";
-            mostrarToastPedido("✅ Carrito limpio. Puedes iniciar otro pedido.");
-        }
-    },900);
+    limpiarCarritoDespuesDePedido();
 }
 window.addEventListener("load", cargarCarrito);
 
@@ -1129,7 +1279,7 @@ function actualizarEstadoAbierto(){
     }else if(dia===0 && h>=14 && h<22){
         abierto=true; texto="🟢 ABIERTO AHORA · Cerramos 10:00 pm";
     }else{
-        texto="🔴 CERRADO AHORA · Revisa horarios";
+        texto="⚠️ CERRADO AHORA · Revisa horarios";
     }
 
     el.className=abierto?"abierto":"cerrado";
@@ -1156,11 +1306,12 @@ const renderCarritoOriginal = renderCarrito;
 renderCarrito = function(){
     renderCarritoOriginal();
     actualizarBarraMobile();
+    actualizarAvisoPago();
 };
 window.addEventListener("load",()=>{
     actualizarEstadoAbierto();
     setInterval(actualizarEstadoAbierto,60000);
-    setTimeout(actualizarBarraMobile,300);
+    setTimeout(()=>{actualizarBarraMobile();actualizarAvisoPago();},300);
 });
 
 </script>
