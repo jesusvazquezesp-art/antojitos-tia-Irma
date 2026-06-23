@@ -631,10 +631,6 @@ body{padding-bottom:76px;}
     50% { opacity: 0.4; }
 }
 
-  .linea-info{
-    display:block;
-    margin:4px 0;
-
 </style>
     
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -665,9 +661,9 @@ function mostrarCategoria(categoria){
 <div class="estado-puesto">
     <div id="estadoAbierto">⏰ Revisando horario...</div>
 
-    <small class="linea-info">📲 Realiza tu pedido</small>
-    <small class="linea-info">🛍️ Recoge cuando te confirmemos</small>
-    <small class="linea-info">💳 Pago por depósito</small>
+    <small> · 📲 Realiza tu pedido</small>
+    <small> · 🛍️ Recoge cuando te confirmemos</small>
+    <small> · 💳 Pago por depósito</small>
 </div>
 
 <div style="text-align:center;">
@@ -741,15 +737,21 @@ function mostrarCategoria(categoria){
 
 <div class="contenedor">
 
-<div class="mas-vendidos">
-    <h2>🔥 Más vendidos</h2><small style="color:#666;">Versión beta: selección recomendada por tia Irma</small>
-    <div class="chips-ventas">
-        <div class="chip-venta" onclick="agregarProducto('Arizona Preparada',50)">🥤 Arizona Preparada $50</div>
-               <div class="chip-venta" onclick="agregarProducto('Clamato Preparado',30)">🍅 Clamato $30</div>
-        
+
+    
+    
+    <div class="mas-vendidos">
+    <h2>🏆 TOP 5 EN VENTAS</h2>
+    <div id="chipsMasVendidos">
+        <div>⏳ Cargando...</div>
     </div>
 </div>
-
+    
+    
+    
+    
+    
+    
 <div class="tabs-productos">
     <button onclick="mostrarCategoria('todos')" class="tab-prod activo">Todos</button>
     <button onclick="mostrarCategoria('bebidas')" class="tab-prod">Bebidas</button>
@@ -1446,6 +1448,84 @@ window.addEventListener("load",()=>{
     setTimeout(()=>{actualizarBarraMobile();actualizarAvisoPago();},300);
 });
 
+    
+    async function cargarMasVendidos(){
+    const cont = document.getElementById("chipsMasVendidos");
+    if(!cont) return;
+
+    cont.innerHTML = `<div style="padding:8px;">⏳ Cargando Top 5...</div>`;
+
+    if(!iniciarSupabaseWeb()){
+        cont.innerHTML = `<div style="padding:8px;color:#b71c1c;font-weight:bold;">⚠️ Sin conexión a Supabase</div>`;
+        return;
+    }
+
+    try{
+        const { data: detalles, error } = await dbWeb
+            .from("pedido_detalle")
+            .select("producto_id,cantidad");
+
+        if(error) throw new Error("pedido_detalle: " + error.message);
+
+        if(!detalles || !detalles.length){
+            cont.innerHTML = `<div style="padding:8px;">Aún no hay ventas registradas</div>`;
+            return;
+        }
+
+        const acumulado = {};
+        detalles.forEach(d=>{
+            if(!d.producto_id) return;
+            acumulado[d.producto_id] = (acumulado[d.producto_id] || 0) + Number(d.cantidad || 0);
+        });
+
+        const ids = Object.keys(acumulado);
+
+        const { data: productos, error: errorProductos } = await dbWeb
+            .from("productos")
+            .select("*")
+            .in("id", ids);
+
+        if(errorProductos) throw new Error("productos: " + errorProductos.message);
+
+        if(!productos || !productos.length){
+            cont.innerHTML = `<div style="padding:8px;">No se encontraron productos vendidos</div>`;
+            return;
+        }
+
+        const top = productos
+            .map(p => ({...p, vendidos: acumulado[p.id] || 0}))
+            .sort((a,b) => b.vendidos - a.vendidos)
+            .slice(0,5);
+
+        cont.innerHTML = top.map((p,i)=>{
+            const puesto = i===0 ? "🥇" : i===1 ? "🥈" : i===2 ? "🥉" : i===3 ? "4️⃣" : "5️⃣";
+            const precio = p.precio ?? p.precio_venta ?? p.costo ?? p.precio_publico ?? 0;
+            const nombre = String(p.nombre || p.producto || "Producto").replace(/'/g, "\\'");
+
+            return `
+                <div onclick="agregarProducto('${nombre}', ${Number(precio || 0)})"
+                     style="padding:10px 8px;border-bottom:1px solid #eee;font-weight:bold;cursor:pointer;">
+                    ${puesto} ${p.nombre || p.producto || "Producto"}
+                    <br><small style="color:#2e7d32;font-weight:bold;">$${Number(precio).toFixed(0)}</small>
+                </div>
+            `;
+        }).join("");
+
+    }catch(e){
+        console.error("MAS VENDIDOS:", e);
+        cont.innerHTML = `
+            <div style="padding:10px;color:#b71c1c;font-weight:bold;">
+                ⚠️ Error:<br>
+                <small>${e.message || e}</small>
+            </div>
+        `;
+    }
+}
+
+window.addEventListener("load", cargarMasVendidos);
+    
+    
+    
 </script>
     
     
