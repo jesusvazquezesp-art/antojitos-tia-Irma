@@ -630,6 +630,11 @@ body{padding-bottom:76px;}
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
 }
+    
+    .linea-info{
+    display:block;
+    margin:4px 0;
+}
 
 </style>
     
@@ -661,18 +666,27 @@ function mostrarCategoria(categoria){
 <div class="estado-puesto">
     <div id="estadoAbierto">⏰ Revisando horario...</div>
 
-    <small> · 📲 Realiza tu pedido</small>
-    <small> · 🛍️ Recoge cuando te confirmemos</small>
-    <small> · 💳 Pago por depósito</small>
+    <small class="linea-info">📲 Realiza tu pedido</small>
+    <small class="linea-info">🛍️ Recoge cuando te confirmemos</small>
+    <small class="linea-info">💳 Pago por depósito</small>
 </div>
-
+    
+    
 <div style="text-align:center;">
     <img src="portada.jpg"
      alt="portada"
      style="
      width:100%;
      max-width:700px;
-     height:auto;
+     height:<div class="estado-puesto">
+    <div id="estadoAbierto">⏰ Revisando horario...</div>
+
+    <small class="linea-info">📲 Realiza tu pedido</small>
+    <small class="linea-info">🛍️ Recoge cuando te confirmemos</small>
+    <small class="linea-info">💳 Pago por depósito</small>
+</div>
+                             
+                             auto;
      object-fit:contain;
      display:block;
      margin:auto;
