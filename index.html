@@ -642,7 +642,7 @@ body{padding-bottom:76px;}
 </head>
 
     <script>
-function mostrarCategoria(categoria){
+function mostrarCategoria(categoria, boton){
     const productos = document.querySelectorAll(".producto-item");
     const botones = document.querySelectorAll(".tab-prod");
 
@@ -655,7 +655,7 @@ function mostrarCategoria(categoria){
     });
 
     botones.forEach(btn => btn.classList.remove("activo"));
-    event.target.classList.add("activo");
+    if(boton) boton.classList.add("activo");
 }
 </script>
     
@@ -678,18 +678,12 @@ function mostrarCategoria(categoria){
      style="
      width:100%;
      max-width:700px;
-     height:<div class="estado-puesto">
-    <div id="estadoAbierto">⏰ Revisando horario...</div>
-
-    
-</div>
-                             
-                             auto;
+     height:auto;
      object-fit:contain;
      display:block;
      margin:auto;
      border-radius:20px;">
-    <h1>🍹 Puesto tia Irma</h1>
+    <h1>🍹 Puesto Tía Irma</h1>
 
 
     
@@ -765,9 +759,9 @@ function mostrarCategoria(categoria){
     
     
 <div class="tabs-productos">
-    <button onclick="mostrarCategoria('todos')" class="tab-prod activo">Todos</button>
-    <button onclick="mostrarCategoria('bebidas')" class="tab-prod">Bebidas</button>
-    <button onclick="mostrarCategoria('Paletas y bolis')" class="tab-prod">Paletas y bolis</button>
+    <button onclick="mostrarCategoria('todos', this)" class="tab-prod activo">Todos</button>
+    <button onclick="mostrarCategoria('bebidas', this)" class="tab-prod">Bebidas</button>
+    <button onclick="mostrarCategoria('Paletas y bolis', this)" class="tab-prod">Paletas y bolis</button>
    
 </div>
     
@@ -911,7 +905,7 @@ function mostrarCategoria(categoria){
     
     
      <div class="card producto-item" data-categoria="Paletas y bolis">
-           <img class="carrusel" data-imagenes="paletaagua1.jpg,paletaagua2.jpg,paletaagua3.jpg,paletaagua4.jpg" src="paletaagua1.jpg" alt="paletaagua2.jpg" alt="paletaagua3.jpg" alt="paletaagua4.jpg">
+           <img class="carrusel" data-imagenes="paletaagua1.jpg,paletaagua2.jpg,paletaagua3.jpg,paletaagua4.jpg" src="paletaagua1.jpg" alt="Paleta de agua">
              <h3 style="color:firebrick">Paleta de agua</h3>
 
 <p class="precio">$14</p>
@@ -936,7 +930,7 @@ function mostrarCategoria(categoria){
         
         
         <div class="card producto-item" data-categoria="Paletas y bolis">
-           <img class="carrusel" data-imagenes="boliagua1.jpg,boliagua2.jpg,boliagua3.jpg,boliagua4.jpg" src="boliagua1.jpg" alt="boliagua2.jpg" alt="boliagua3.jpg" alt="boliagua4.jpg">
+           <img class="carrusel" data-imagenes="boliagua1.jpg,boliagua2.jpg,boliagua3.jpg,boliagua4.jpg" src="boliagua1.jpg" alt="Boli de agua">
              <h3 style="color:firebrick">Boli de Agua</h3>
 
 <p class="precio">$14</p>
@@ -961,7 +955,7 @@ function mostrarCategoria(categoria){
         
         
          <div class="card producto-item" data-categoria="Paletas y bolis">
-           <img class="carrusel" data-imagenes="bolicrema1.jpg,bolicrema2.jpg,bolicrema3.jpg,bolicrema4.jpg" src="bolicrema1.jpg" alt="bolicrema2.jpg" alt="bolicrema3.jpg" alt="bolicrema4.jpg">
+           <img class="carrusel" data-imagenes="bolicrema1.jpg,bolicrema2.jpg,bolicrema3.jpg,bolicrema4.jpg" src="bolicrema1.jpg" alt="Boli de crema">
              <h3 style="color:firebrick">Boli de Crema</h3>
 
 <p class="precio">$14</p>
@@ -1011,7 +1005,7 @@ function mostrarCategoria(categoria){
         
         
         <div class="card producto-item" data-categoria="Paletas y bolis">
-           <img class="carrusel" data-imagenes="nieve1.jpg,nieve2.jpg,nieve3.jpg,nieve4.jpg,,nieve5.jpg" src="nieve1.jpg" alt="nieve2.jpg" alt="nieve3.jpg" alt="nievecrema4.jpg" alt="nievecrema5.jpg">
+           <img class="carrusel" data-imagenes="nieve1.jpg,nieve2.jpg,nieve3.jpg,nieve4.jpg,nieve5.jpg" src="nieve1.jpg" alt="Vasito de nieve">
              <h3 style="color:firebrick">Vasito de Nieve</h3>
 
 <p class="precio">$18</p>
@@ -1033,7 +1027,7 @@ function mostrarCategoria(categoria){
                       </div>
         
         
-        <div class="card producto-item" data-categoria="Paletas y boli">
+        <div class="card producto-item" data-categoria="Paletas y bolis">
             <img src="sandwich.jpg" alt="sandwich">
             <h3>Sandwich</h3>
             <p class="precio">$18</p>
@@ -1109,7 +1103,7 @@ function mostrarCategoria(categoria){
             También puedes liquidar completo si así gustas.<br><br>
             Una vez realizado el depósito, se inicia la preparación y <b>se te notificará vía WhatsApp cuando tu pedido esté listo</b>.<br><br>
             <b>Cuenta / tarjeta:</b> PENDIENTE DE AGREGAR<br>
-            <b>Titular:</b> tia Irma
+            <b>Titular:</b> Tía Irma
         </div>
         <div id="resumenAnticipo" class="resumen-anticipo">Anticipo mínimo: $0 · Saldo al recoger: $0</div>
 
@@ -1119,7 +1113,7 @@ function mostrarCategoria(categoria){
 </div>
 
 <footer>
-    © 2026 Puesto tia Irma · Gracias por tu compra
+    © 2026 Puesto Tía Irma · Gracias por tu compra
 </footer>
 <script>
     
@@ -1254,7 +1248,7 @@ function actualizarAvisoPago(){
             También puedes liquidar completo si así gustas.<br><br>
             Una vez realizado el depósito, se inicia la preparación y <b>se te notificará vía WhatsApp cuando tu pedido esté listo</b>.<br><br>
             <b>Cuenta / tarjeta:</b> PENDIENTE DE AGREGAR<br>
-            <b>Titular:</b> tia Irma`;
+            <b>Titular:</b> Tía Irma`;
         }
         if(resumen) resumen.innerHTML=`Anticipo mínimo: $${anticipo.toFixed(0)} · Saldo al recoger: $${saldo.toFixed(0)}`;
     }
@@ -1402,7 +1396,7 @@ function actualizarEstadoAbierto(){
     let apertura=null;
     let cierre=null;
 
-    if(dia===5){ // Jueves y Viernes
+    if(dia===5){ // Viernes
         apertura=17*60;
         cierre=22*60;
     }else if(dia===6){ // Sábado
