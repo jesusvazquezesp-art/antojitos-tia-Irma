@@ -1467,52 +1467,74 @@ window.addEventListener("load",()=>{
     }
 
     try{
-        const { data: detalles, error } = await dbWeb
-            .from("pedido_detalle")
-            .select("producto_id,cantidad");
+        /*
+          TOP 5 VISUAL DE TODAS LAS VENTAS
+          Fuente correcta: ventas -> pedido_detalle -> productos(nombre)
+          No muestra cantidades ni precios. Solo nombres para orientar al cliente.
+        */
 
-        if(error) throw new Error("pedido_detalle: " + error.message);
+        const { data: ventas, error: errorVentas } = await dbWeb
+            .from("ventas")
+            .select("pedido_id, pedidos(estado)")
+            .limit(1000);
 
-        if(!detalles || !detalles.length){
+        if(errorVentas) throw new Error("ventas: " + errorVentas.message);
+
+        const ventasValidas = (ventas || []).filter(v=>{
+            const estado = String(v.pedidos?.estado || "vendido").toLowerCase();
+            return estado !== "cancelado" && estado !== "anulada" && estado !== "anulado";
+        });
+
+        const pedidoIds = [...new Set(ventasValidas.map(v=>v.pedido_id).filter(Boolean))];
+
+        if(!pedidoIds.length){
             cont.innerHTML = `<div style="padding:8px;">Aún no hay ventas registradas</div>`;
             return;
         }
 
-        const acumulado = {};
-        detalles.forEach(d=>{
-            if(!d.producto_id) return;
-            acumulado[d.producto_id] = (acumulado[d.producto_id] || 0) + Number(d.cantidad || 0);
-        });
+        const { data: detalles, error: errorDetalle } = await dbWeb
+            .from("pedido_detalle")
+            .select("producto_id,cantidad,productos(nombre)")
+            .in("pedido_id", pedidoIds);
 
-        const ids = Object.keys(acumulado);
+        if(errorDetalle) throw new Error("pedido_detalle: " + errorDetalle.message);
 
-        const { data: productos, error: errorProductos } = await dbWeb
-            .from("productos")
-            .select("*")
-            .in("id", ids);
-
-        if(errorProductos) throw new Error("productos: " + errorProductos.message);
-
-        if(!productos || !productos.length){
-            cont.innerHTML = `<div style="padding:8px;">No se encontraron productos vendidos</div>`;
+        if(!detalles || !detalles.length){
+            cont.innerHTML = `<div style="padding:8px;">Aún no hay productos vendidos</div>`;
             return;
         }
 
-        const top = productos
-            .map(p => ({...p, vendidos: acumulado[p.id] || 0}))
+        function normalizarNombreTop5(txt){
+            return String(txt || "")
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        const acumulado = {};
+        detalles.forEach(d=>{
+            const nombre = d.productos?.nombre || "Producto";
+            const key = normalizarNombreTop5(nombre);
+            if(!key) return;
+            if(!acumulado[key]) acumulado[key] = { nombre, vendidos:0 };
+            acumulado[key].vendidos += Number(d.cantidad || 0);
+        });
+
+        const top = Object.values(acumulado)
             .sort((a,b) => b.vendidos - a.vendidos)
             .slice(0,5);
 
+        if(!top.length){
+            cont.innerHTML = `<div style="padding:8px;">Aún no hay ventas registradas</div>`;
+            return;
+        }
+
         cont.innerHTML = top.map((p,i)=>{
             const puesto = i===0 ? "🥇" : i===1 ? "🥈" : i===2 ? "🥉" : i===3 ? "4️⃣" : "5️⃣";
-            const precio = p.precio ?? p.precio_venta ?? p.costo ?? p.precio_publico ?? 0;
-            const nombre = String(p.nombre || p.producto || "Producto").replace(/'/g, "\\'");
-
             return `
-                <div onclick="agregarProducto('${nombre}', ${Number(precio || 0)})"
-                     style="padding:10px 8px;border-bottom:1px solid #eee;font-weight:bold;cursor:pointer;">
-                    ${puesto} ${p.nombre || p.producto || "Producto"}
-                    <br><small style="color:#2e7d32;font-weight:bold;">$${Number(precio).toFixed(0)}</small>
+                <div style="padding:10px 8px;border-bottom:1px solid #eee;font-weight:bold;">
+                    ${puesto} ${p.nombre}
                 </div>
             `;
         }).join("");
