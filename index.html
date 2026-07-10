@@ -710,15 +710,12 @@ function mostrarCategoria(categoria, boton){
 </a>
          
 </div>
-    
     <h3 style="color:black;">Horario:</h3>
-    <h3>
-    <span style="color:#ff5722;">📅 Viernes</span>
-    <span style="color:black;"> de 5 a 10 pm</span>
-</h3>
-
+    <h3><span style="color:#ff5722;">📅 Lunes a jueves</span>
+    <span style="color:black;"> de 2 a 8 pm</span></h3>
+    
 <h3>
-    <span style="color:#2196f3;">📅 Sábados</span>
+    <span style="color:#2196f3;">📅 viernes y Sábados</span>
     <span style="color:black;"> de 5 a 10 pm</span>
 </h3>
 
@@ -1396,8 +1393,20 @@ function actualizarEstadoAbierto(){
     let apertura=null;
     let cierre=null;
 
-    if(dia===5){ // Viernes
-        apertura=17*60;
+    if(dia===1){ // lunes
+        apertura=14*60;
+        cierre=20*60;
+     }else if(dia===2){ // martes
+        apertura=14*60;
+        cierre=20*60;
+    }else if(dia===3){ // miercoles
+        apertura=14*60;
+        cierre=20*60;
+    }else if(dia===4){ // jueves
+        apertura=14*60;
+        cierre=20*60;
+     }else if(dia===5){ // viernes
+        apertura=14*60;
         cierre=22*60;
     }else if(dia===6){ // Sábado
         apertura=17*60;
