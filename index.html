@@ -1023,10 +1023,13 @@ function mostrarCategoria(categoria, boton){
 </details>
                       </div>
         
-        
+         <!-- Quitar hidden cuando haya existencias -->
         <div class="card producto-item" data-categoria="Paletas y bolis">
             <img src="sandwich.jpg" alt="sandwich">
-            <h3>Sandwich</h3>
+            
+            <h3 style="color:darkred;" hidden>Sandwich</h3>
+        <h3 style="color:gray;">Sandwich (esperando existencias)</h3>
+           
             <p class="precio">$18</p>
 <button class="btn-agregar" onclick="agregarProducto('Sandwich',18)">➕ Agregar al pedido</button>
 
@@ -1037,7 +1040,6 @@ function mostrarCategoria(categoria, boton){
         
         
         
-    
     
     
     
