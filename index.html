@@ -636,21 +636,6 @@ body{padding-bottom:76px;}
     margin:4px 0;
 }
 
-.horario-semanal-fila{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-    padding:7px 4px;
-    border-bottom:1px solid rgba(0,0,0,.12);
-    text-align:left;
-}
-.horario-semanal-fila:last-child{border-bottom:none;}
-.horario-dia{font-weight:bold;}
-.horario-horas{font-weight:bold;}
-@media(max-width:520px){
-    .horario-semanal-fila{font-size:14px;}
-}
-
 </style>
     
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -725,13 +710,19 @@ function mostrarCategoria(categoria, boton){
 </a>
          
 </div>
-    <h3 style="color:black;">⏰ Horario</h3>
-    <div id="horarioResumen" style="font-weight:bold;">⏳ Consultando horario...</div>
+    <h3 style="color:black;">Horario:</h3>
+    <h3><span style="color:red;">📅 Lunes a jueves</span>
+    <span style="color:black;"> de 2 a 8 pm</span></h3>
+    
+<h3>
+    <span style="color:#2196f3;">📅 viernes y Sábados</span>
+    <span style="color:black;"> de 5 a 10 pm</span>
+</h3>
 
-    <details style="margin-top:8px;">
-      <summary style="cursor:pointer;font-weight:bold;">📅 Ver horario semanal</summary>
-      <div id="horarioSemanal" style="margin-top:8px;">⏳ Cargando...</div>
-    </details>
+<h3>
+    <span style="color:#4caf50;">📅 Domingo</span>
+    <span style="color:black;"> de 5 a 9 pm</span>
+</h3>
     <h3 style="color:black;">Pedidos rápidos por WhatsApp:</h3>
    
     
@@ -1393,196 +1384,68 @@ window.addEventListener("load", cargarCarrito);
 
 
 /* ===== Mobile First helpers ===== */
-let horarioNormalWeb = [];
-let excepcionesHorarioWeb = [];
-let horarioWebListo = false;
-
-const NOMBRES_DIAS_HORARIO = [
-    "Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"
-];
-
-function formatoHoraWeb(hora){
-    if(!hora) return "";
-    const partes=String(hora).slice(0,5).split(":");
-    if(partes.length<2) return String(hora);
-    let h=Number(partes[0]);
-    const m=partes[1];
-    const ampm=h>=12 ? "PM" : "AM";
-    h=h%12 || 12;
-    return `${h}:${m} ${ampm}`;
-}
-
-function minutosHoraWeb(hora){
-    if(!hora) return null;
-    const p=String(hora).slice(0,5).split(":").map(Number);
-    if(p.length<2 || Number.isNaN(p[0]) || Number.isNaN(p[1])) return null;
-    return p[0]*60+p[1];
-}
-
-function fechaLocalISOWeb(fecha){
-    const y=fecha.getFullYear();
-    const m=String(fecha.getMonth()+1).padStart(2,"0");
-    const d=String(fecha.getDate()).padStart(2,"0");
-    return `${y}-${m}-${d}`;
-}
-
-function escaparHorarioWeb(txt){
-    return String(txt ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-async function cargarHorarioWeb(){
-    const estado=document.getElementById("estadoAbierto");
-    const semanal=document.getElementById("horarioSemanal");
-    const resumen=document.getElementById("horarioResumen");
-
-    if(!iniciarSupabaseWeb()){
-        if(estado){ estado.className="cerrado"; estado.textContent="⚠️ No se pudo conectar al horario"; }
-        if(resumen) resumen.textContent="No se pudo consultar el horario.";
-        if(semanal) semanal.innerHTML="⚠️ Sin conexión a Supabase";
-        return;
-    }
-
-    try{
-        const [normal, excepciones] = await Promise.all([
-            dbWeb.from("horarios_habituales")
-                .select("dia_semana,nombre_dia,hora_apertura,hora_cierre,activo")
-                .eq("activo",true),
-            dbWeb.from("horarios_excepciones")
-                .select("fecha_inicio,fecha_fin,motivo,activo,hora_inicio,hora_fin")
-                .eq("activo",true)
-                .order("fecha_inicio",{ascending:true})
-        ]);
-
-        if(normal.error) throw new Error("horarios_habituales: "+normal.error.message);
-        if(excepciones.error) throw new Error("horarios_excepciones: "+excepciones.error.message);
-
-        horarioNormalWeb=normal.data || [];
-        excepcionesHorarioWeb=excepciones.data || [];
-        horarioWebListo=true;
-        renderHorarioSemanalWeb();
-        actualizarEstadoAbierto();
-    }catch(e){
-        console.error("HORARIO TIA IRMA:",e);
-        horarioWebListo=false;
-        if(estado){ estado.className="cerrado"; estado.textContent="⚠️ No se pudo consultar el horario"; }
-        if(resumen) resumen.innerHTML=`⚠️ <small>${escaparHorarioWeb(e.message || e)}</small>`;
-        if(semanal) semanal.innerHTML=`⚠️ <small>${escaparHorarioWeb(e.message || e)}</small>`;
-    }
-}
-
-function obtenerHorarioNormalDia(dia){
-    return horarioNormalWeb.find(x=>Number(x.dia_semana)===Number(dia)) || null;
-}
-
-function obtenerExcepcionActivaHoy(ahora){
-    const hoy=fechaLocalISOWeb(ahora);
-    const minuto=ahora.getHours()*60+ahora.getMinutes();
-
-    for(const ex of excepcionesHorarioWeb){
-        if(!ex.fecha_inicio || !ex.fecha_fin) continue;
-        if(hoy < ex.fecha_inicio || hoy > ex.fecha_fin) continue;
-
-        const ini=minutosHoraWeb(ex.hora_inicio);
-        const fin=minutosHoraWeb(ex.hora_fin);
-
-        if(ini===null || fin===null) return {ex,tipo:"todo"};
-        if(minuto>=ini && minuto<fin) return {ex,tipo:"intervalo"};
-    }
-    return null;
-}
-
-function renderHorarioSemanalWeb(){
-    const cont=document.getElementById("horarioSemanal");
-    if(!cont) return;
-
-    const orden=[1,2,3,4,5,6,0];
-    cont.innerHTML=orden.map(dia=>{
-        const h=obtenerHorarioNormalDia(dia);
-        const nombre=NOMBRES_DIAS_HORARIO[dia];
-        if(!h || !h.hora_apertura || !h.hora_cierre){
-            return `<div class="horario-semanal-fila"><span class="horario-dia">${nombre}</span><span class="horario-horas">Cerrado</span></div>`;
-        }
-        return `<div class="horario-semanal-fila"><span class="horario-dia">${nombre}</span><span class="horario-horas">${formatoHoraWeb(h.hora_apertura)} → ${formatoHoraWeb(h.hora_cierre)}</span></div>`;
-    }).join("");
-}
-
 function actualizarEstadoAbierto(){
     const el=document.getElementById("estadoAbierto");
-    const resumen=document.getElementById("horarioResumen");
     if(!el) return;
-
-    if(!horarioWebListo){
-        el.className="proximo";
-        el.textContent="⏳ Revisando horario...";
-        return;
-    }
 
     const ahora=new Date();
     const dia=ahora.getDay();
     const minutosActuales=ahora.getHours()*60+ahora.getMinutes();
-    const h=obtenerHorarioNormalDia(dia);
-    const excepcion=obtenerExcepcionActivaHoy(ahora);
 
-    if(excepcion){
-        const ex=excepcion.ex;
-        const motivo=escaparHorarioWeb(ex.motivo || "Permiso / cierre temporal");
-        el.className="cerrado";
-        if(excepcion.tipo==="todo"){
-            el.textContent="🔴 CERRADO HOY";
-            if(resumen) resumen.innerHTML=`🚫 ${motivo}`;
-        }else{
-            el.textContent="🔴 CERRADO TEMPORALMENTE";
-            if(resumen) resumen.innerHTML=`🚫 ${motivo}<br><small>Regresamos a las ${formatoHoraWeb(ex.hora_fin)}</small>`;
+    let apertura=null;
+    let cierre=null;
+
+    if(dia===1){ // lunes
+        apertura=14*60;
+        cierre=20*60;
+     }else if(dia===2){ // martes
+        apertura=14*60;
+        cierre=20*60;
+    }else if(dia===3){ // miercoles
+        apertura=14*60;
+        cierre=20*60;
+    }else if(dia===4){ // jueves
+        apertura=14*60;
+        cierre=20*60;
+     }else if(dia===5){ // viernes
+        apertura=14*60;
+        cierre=22*60;
+    }else if(dia===6){ // Sábado
+        apertura=17*60;
+        cierre=22*60;
+    }else if(dia===0){ // Domingo
+        apertura=17*60;
+        cierre=21*60;
+    }
+
+    if(apertura!==null){
+
+        // Abrimos en menos de 30 minutos
+        if(minutosActuales >= apertura-30 && minutosActuales < apertura){
+            el.className="proximo";
+            el.textContent="🟡 ABRIMOS EN MENOS DE 30 MINUTOS";
+            return;
         }
-        return;
+
+        // Cerramos pronto (últimos 30 minutos)
+        if(minutosActuales >= cierre-30 && minutosActuales < cierre){
+            el.className="cerrado";
+            el.textContent="🔴 CERRAMOS PRONTO";
+            return;
+        }
+
+        // Abierto
+        if(minutosActuales >= apertura && minutosActuales < cierre){
+            el.className="abierto";
+            el.textContent="🟢 ABIERTO AHORA";
+            return;
+        }
     }
 
-    if(!h || !h.hora_apertura || !h.hora_cierre){
-        el.className="cerrado";
-        el.textContent="🔴 CERRADO HOY";
-        if(resumen) resumen.textContent="Hoy no abrimos.";
-        return;
-    }
-
-    const apertura=minutosHoraWeb(h.hora_apertura);
-    const cierre=minutosHoraWeb(h.hora_cierre);
-
-    if(apertura===null || cierre===null){
-        el.className="cerrado";
-        el.textContent="⚠️ HORARIO NO DISPONIBLE";
-        if(resumen) resumen.textContent="Revisa el horario en administración.";
-        return;
-    }
-
-    if(minutosActuales>=apertura-30 && minutosActuales<apertura){
-        el.className="proximo";
-        el.textContent="🟡 ABRIMOS EN MENOS DE 30 MINUTOS";
-        if(resumen) resumen.textContent=`Hoy abrimos a las ${formatoHoraWeb(h.hora_apertura)}`;
-        return;
-    }
-    if(minutosActuales>=cierre-30 && minutosActuales<cierre){
-        el.className="cerrado";
-        el.textContent="🔴 CERRAMOS PRONTO";
-        if(resumen) resumen.textContent=`Cerramos a las ${formatoHoraWeb(h.hora_cierre)}`;
-        return;
-    }
-    if(minutosActuales>=apertura && minutosActuales<cierre){
-        el.className="abierto";
-        el.textContent="🟢 ABIERTO AHORA";
-        if(resumen) resumen.textContent=`Hoy: ${formatoHoraWeb(h.hora_apertura)} → ${formatoHoraWeb(h.hora_cierre)}`;
-        return;
-    }
-
+    // Cerrado
     el.className="cerrado";
     el.textContent="🔴 CERRADO AHORA";
-    if(resumen) resumen.textContent=`Hoy abrimos de ${formatoHoraWeb(h.hora_apertura)} a ${formatoHoraWeb(h.hora_cierre)}`;
 }
-
 function actualizarBarraMobile(){
     const cantidad=carrito.reduce((s,x)=>s+Number(x.cantidad),0);
     const bc=document.getElementById("barraCantidad");
@@ -1598,7 +1461,6 @@ renderCarrito = function(){
 };
 window.addEventListener("load",()=>{
     actualizarEstadoAbierto();
-    cargarHorarioWeb();
     setInterval(actualizarEstadoAbierto,60000);
     setTimeout(()=>{actualizarBarraMobile();actualizarAvisoPago();},300);
 });
