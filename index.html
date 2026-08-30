@@ -1020,6 +1020,8 @@ function mostrarCategoria(categoria, boton){
 <div class="tabs-productos">
     <button onclick="mostrarCategoria('todos', this)" class="tab-prod activo">Todos</button>
     <button onclick="mostrarCategoria('bebidas', this)" class="tab-prod">Bebidas</button>
+    <button onclick="mostrarCategoria('Sopa', this)" class="tab-prod">Sopa</button>
+    <button onclick="mostrarCategoria('Jugo', this)" class="tab-prod">Jugo</button>
     <button onclick="mostrarCategoria('Paletas y bolis', this)" class="tab-prod">Paletas y bolis</button>
    
 </div>
@@ -1107,6 +1109,54 @@ function mostrarCategoria(categoria, boton){
 </details>
                       </div>
 
+        
+        
+        
+         <div class="card producto-item" data-categoria="bebidas">
+             <img src="arizonap2.jpg" alt="Arizonap2">
+            <h3>Arizona Preparada (Chica) 355 ml</h3>
+            <p class="precio">$30</p>
+<button class="btn-agregar" onclick="agregarProducto('Arizona Preparada (chica) 355 ml',30)">➕ Agregar al pedido</button>
+
+              
+<details>
+    <summary class="detalle-btn">
+    Detalles del producto
+</summary>
+
+    <div style="margin-top:10px;">
+        <h3 style="color:black;">Sabores:</h3>
+
+        
+        
+        <!-- Quitar hidden cuando haya existencias -->
+<h3 style="color:darkblue;">● Watermelon</h3>
+        <h3 style="color:gray;" hidden>● Watermelon (esperando existencias)</h3>
+     
+        
+        
+        <h3 style="color:darkblue;">● Strawberry Kiwi</h3>
+<h3 style="color:gray;" hidden>● Strawberry Kiwi (esperando existencias)</h3>
+     
+        
+        
+        <h3 style="color:black;">Se añade la fruta del sabor que se indica</h3>
+         <h3 style="color:black;">Contiene:</h3>
+        <h3 style="color:darkblue;">● Varias Gomitas</h3>
+        <h3 style="color:darkblue;">● Tira de tamarindo</h3>
+        
+        <h3 style="color:black;">Escarchado:</h3>
+        <h3 style="color:darkblue;">● De chamoy Rojo o azul</h3>
+        <h3 style="color:darkblue;">● Con Tiko Rojo o azul</h3>
+        
+         <h3 style="color:black;">Se le agregara el chamoy y tiko elejido a las gomitas y a la fruta</h3>
+        
+        
+    </div>
+</details>
+                      </div>
+        
+        
         
         <div class="card producto-item" data-categoria="bebidas">
             <img src="Arizona.jpg" alt="Arizona">
@@ -1297,6 +1347,114 @@ function mostrarCategoria(categoria, boton){
 
            
         </div>
+        
+            <!-- Quitar hidden cuando haya existencias -->
+        <div class="card producto-item" data-categoria="Sopa">
+            <img src="maruchan.jpg" alt="Maruchan">
+            
+            <h3 style="color:darkred;">Maruchan</h3>
+        <h3 style="color:gray;" hidden>Marucha (esperando existencias)</h3>
+           
+            <p class="precio">$18</p>
+<button class="btn-agregar" onclick="agregarProducto('Maruchan',18)">➕ Agregar al pedido</button>
+            
+            
+<details>
+    <summary class="detalle-btn">
+    Detalles del producto
+</summary>
+
+    <div style="margin-top:10px;">
+        <h3 style="color:darkblue;">● Maruchan</h3>
+         <h3 style="color:lawngreen;">Sabor unico:</h3>
+        <h3 style="color:lawngreen;">Camaron, Limón, Habanero</h3>
+        <h3 style="color:black;">Preparado con:</h3>
+        <h3 style="color:darkblue;">Agua Caliente</h3>
+         <h3 style="color:darkblue;">1/2 Limon</h3>
+         <h3 style="color:darkblue;">Salsa Valentina</h3>
+        
+    </div>
+</details>
+
+           
+        </div>
+        
+         <!-- Quitar hidden cuando haya existencias -->
+        <div class="card producto-item" data-categoria="Jugo">
+            <img src="jugos_solos.jpg" alt="Jugo_solo">
+            
+            <h3 style="color:darkred;">Jugo Congelado</h3>
+        <h3 style="color:gray;" hidden>Jugo Congelado (esperando existencias)</h3>
+           
+            <p class="precio">$15</p>
+<button class="btn-agregar" onclick="agregarProducto('Jugo Congelado',15)">➕ Agregar al pedido</button>
+            
+            
+<details>
+    <summary class="detalle-btn">
+    Detalles del producto
+</summary>
+
+    <div style="margin-top:10px;">
+        <h3 style="color:darkblue;">● Jugo Congelado</h3>
+         <h3 style="color:lawngreen;">Sabores:</h3>
+        <h3 style="color:yellow;">Mango</h3>
+        <h3 style="color:red;">Manzana</h3>
+        <h3 style="color:peachpuff;">Durazno</h3>
+        
+        
+        
+    </div>
+</details>
+
+           
+        </div>
+        
+        
+        
+        
+         <!-- Quitar hidden cuando haya existencias -->
+        <div class="card producto-item" data-categoria="Jugo">
+            <img src="Jugo.jpg" alt="Jugo">
+            
+            <h3 style="color:darkred;">Jugo Preparado</h3>
+        <h3 style="color:gray;" hidden>Jugo Preparado (esperando existencias)</h3>
+           
+            <p class="precio">$25</p>
+<button class="btn-agregar" onclick="agregarProducto('Jugo Preparado',25)">➕ Agregar al pedido</button>
+            
+            
+<details>
+    <summary class="detalle-btn">
+    Detalles del producto
+</summary>
+
+    <div style="margin-top:10px;">
+        <h3 style="color:darkblue;">● Jugo Preparado</h3>
+         <h3 style="color:lawngreen;">Sabores:</h3>
+        <h3 style="color:yellow;">Mango</h3>
+        <h3 style="color:red;">Manzana</h3>
+        <h3 style="color:peachpuff;">Durazno</h3>
+        
+        <h3 style="color:black;">Puede llevar:</h3>
+        
+        <h3 style="color:darkblue;">● Varias Gomitas</h3>
+        <h3 style="color:darkblue;">● Tira de tamarindo</h3>
+         
+        <h3 style="color:darkblue;">● De chamoy Rojo o azul</h3>
+        <h3 style="color:darkblue;">● Con Tiko Rojo o azul</h3>
+        
+    </div>
+</details>
+
+           
+        </div>
+        
+        
+       
+        
+        
+        
         
         
         
